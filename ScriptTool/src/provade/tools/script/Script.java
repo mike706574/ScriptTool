@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import provade.tools.schema.Export;
 import provade.tools.schema.Import;
@@ -18,24 +17,23 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.update.Update;
-import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 
 public class Script {
 	public List<Statement> allStmts;
-	public List<Statement> updateStmts;
-	public List<Statement> insertStmts;
-	public List<Statement> exportStmts;
-	public List<Statement> deleteStmts;
+	public List<Update> updateStmts;
+	public List<Insert> insertStmts;
+	public List<Export> exportStmts;
+	public List<Delete> deleteStmts;
 	public List<String> currentStmtStrings;
-	
+
 	public Script() {
 		allStmts = new LinkedList<Statement>();
-		updateStmts = new LinkedList<Statement>();
-		insertStmts = new LinkedList<Statement>();
-		exportStmts = new LinkedList<Statement>();
-		deleteStmts = new LinkedList<Statement>();		
+		updateStmts = new LinkedList<Update>();
+		insertStmts = new LinkedList<Insert>();
+		exportStmts = new LinkedList<Export>();
+		deleteStmts = new LinkedList<Delete>();
 	}
-	
+
 	public Script(File scriptFile) throws IOException, JSQLParserException {
 		this();
 		currentStmtStrings = FileUtils.readLines(scriptFile);
@@ -43,40 +41,55 @@ public class Script {
 			if (!s.isEmpty()) {
 				this.AddStatement(s);
 			}
-		}		
+		}
 	}
-	
+
 	public List<Statement> CreateBackup() {
+		List<Statement> bkUpStmts = new LinkedList<Statement>();
 		for (Statement s : updateStmts) {
 			Export e = new Export((Update) s);
 			exportStmts.add(e);
+			bkUpStmts.add(e);
 		}
 
-		return exportStmts;
+		return bkUpStmts;
 	}
-	
+
 	public List<Statement> CreateBackout() {
 		List<Statement> bkStmts = new LinkedList<Statement>();
 		if (exportStmts.size() > 0) {
+			List<Delete> eDeletes = Script.GetDeletesFromExports(exportStmts);
+			bkStmts.addAll(eDeletes);
 			bkStmts.add(new Import());
 		}
 		this.CreateDeletes();
 		bkStmts.addAll(deleteStmts);
 		return bkStmts;
 	}
-	
+
 	public void AddStatement(String stmt) throws JSQLParserException {
 		Statement pStmt = CCJSqlParserUtil.parse(stmt);
 
 		allStmts.add(pStmt);
 		if (pStmt instanceof Update) {
-			updateStmts.add(pStmt);
+			updateStmts.add((Update)pStmt);
 		} else if (pStmt instanceof Insert) {
-			insertStmts.add(pStmt);
+			insertStmts.add((Insert)pStmt);
 		}
 	}
-	
-	private void CreateDeletes() {		
+
+	public static List<Delete> GetDeletesFromExports(List<Export> exports) {
+		List<Delete> deletes = new LinkedList<Delete>();
+		for (Export e : exports) {
+			Delete d = new Delete();
+			d.setTable(e.getTable());
+			d.setWhere(e.getWhere());
+			deletes.add(d);
+		}
+		return deletes;
+	}
+
+	private void CreateDeletes() {
 		for (Statement s : insertStmts) {
 			Insert inStmt = (Insert) s;
 			Delete d = new Delete();
@@ -86,29 +99,16 @@ public class Script {
 			List<Column> cols = inStmt.getColumns();
 			Expression whereExp = null;
 			if (cols == null) {
-				InsertSelectDeParser dParse = new InsertSelectDeParser();
-				ExpressionDeParser eParse = new ExpressionDeParser(dParse, b);
-				dParse.setBuffer(b);
-				inStmt.getItemsList().accept(eParse);
-				whereExp = dParse.subSelectWhere;
+				AllWhereExpDeParser dParse = new AllWhereExpDeParser(b);
+				whereExp = dParse.getOptimizedWhere(inStmt.getItemsList());
 			} else {
-				WhereExpDeParser eParse = new WhereExpDeParser(cols);
-				
-				eParse.setBuffer(b);
-				inStmt.getItemsList().accept(eParse);
-				
-				List<String> whereStrList = eParse.whereStrList;
-				String whereStr = StringUtils.join(whereStrList, " AND ");
-				try {
-					whereExp = CCJSqlParserUtil.parseCondExpression(whereStr);
-				} catch (JSQLParserException e) {
-					//TODO: do something, maybe add it to a list of error statements that is read back to the user
-				}				
+				WhereExpDeParser eParse = new WhereExpDeParser(cols, b);
+				whereExp = eParse.getWhereExp(inStmt.getItemsList());
 			}
-			
+
 			d.setWhere(whereExp);
 			deleteStmts.add(d);
 		}
 	}
-	
+
 }

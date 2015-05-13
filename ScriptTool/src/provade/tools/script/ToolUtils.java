@@ -6,14 +6,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.statement.Statement;
 
 public class ToolUtils {
 	
 	
-	public static void WriteBackupToFile(File newFile, Script script) throws IOException {
+	public static void WriteBackupToFile(File newFile, File sourceFile) throws IOException, JSQLParserException {
+		Script script = new Script(sourceFile);
+		
 		List<Statement> eStmts = script.CreateBackup();
 		List<Statement> bkStmts = script.CreateBackup();
 		List<String> currentStrings = script.currentStmtStrings;
@@ -25,6 +29,14 @@ public class ToolUtils {
 
 		String scriptStr = StringUtils.join(fileStrings, null);
 		FileUtils.writeStringToFile(newFile, scriptStr, "UTF-8", true);
+	}
+	
+	public static File CreateFileFromSource(File sourceFile) throws IOException {
+		String base = FilenameUtils.getBaseName(sourceFile.getAbsolutePath());
+		String newPath = base + "_out.dms";
+		
+		File newFile = new File(newPath);
+		return newFile;
 	}
 	
 	public static String addEndLine(String str) {

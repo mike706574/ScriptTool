@@ -2,9 +2,7 @@ package provade.tools.schema;
 
 import java.util.List;
 
-import provade.tools.script.CopyStmt;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
@@ -28,6 +26,14 @@ public class Export implements Statement {
 	public void accept(StatementVisitor statementVisitor) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public Table getTable() {
+		return table;
+	}
+	
+	public Expression getWhere() {
+		return where;
 	}
 	
 	public void AddExpressions(List<Expression> exps) {

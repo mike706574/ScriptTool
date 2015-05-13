@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import provade.tools.gui.MainWindow;
 import provade.tools.schema.Export;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -52,16 +53,19 @@ public class ScriptMain  {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		String stmt = "INSERT INTO psoprdefn select 'hi', 'ho', 'he' from ps_installation where oprid = 'tim'";
+		/*String stmt1 = "INSERT INTO psoprdefn select distinct a.oprid, 'hi', 'ho', 'he' from psoprdefn a where a.oprdefndescr = 'andra' and not exists (select 'y' from psoprdefn where oprid = 'tim' and emailid = 'a@a.com')";
+		String stmt2 = "insert into psoprdefn (oprid, emailid, amount) values('tim', 'a@a.com', 100)";
 		Script script = new Script();
 		try {
-			script.AddStatement(stmt);
+			script.AddStatement(stmt1);
+			script.AddStatement(stmt2);
 		} catch (JSQLParserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		List<Statement> dStmts = script.CreateBackout();
-		dStmts.forEach(s -> System.out.println(s.toString()));
+		dStmts.forEach(s -> System.out.println(s.toString()));*/
+		Application.launch(MainWindow.class, args);
 	}
 
 }
