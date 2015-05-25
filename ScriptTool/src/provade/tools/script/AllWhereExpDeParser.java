@@ -1,20 +1,26 @@
 package provade.tools.script;
 
 
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 
 public class AllWhereExpDeParser extends ExpressionDeParser {
 	public Expression whereExp;
+	public StringBuilder whereExpStr;
 	
 	public AllWhereExpDeParser(StringBuilder buffer) {
 		InsertSelectDeParser selDeParser = new InsertSelectDeParser();
 		this.setBuffer(buffer);
 		selDeParser.setBuffer(buffer);
 		this.setSelectVisitor(selDeParser);
+		this.whereExpStr = new StringBuilder();
 	}
 	
 	public Expression getOptimizedWhere(ItemsList iList) {
@@ -39,8 +45,24 @@ public class AllWhereExpDeParser extends ExpressionDeParser {
 			if (rExp instanceof SubSelect) {
 		    	InsertSelectDeParser visitor = (InsertSelectDeParser) this.getSelectVisitor();
 		    	SubSelect subSel = (SubSelect) rExp;
-		    	this.whereExp = visitor.getWhere(subSel.getSelectBody());
+		    	Expression wExp = visitor.getWhere(subSel.getSelectBody());
+		    	
+		    	//Need to remove any alias in the where clause
+		    	AllWhereExpDeParser whereDeParse = new AllWhereExpDeParser(this.whereExpStr);
+		    	wExp.accept(whereDeParse);
+		    	
+		    	try {
+					this.whereExp = CCJSqlParserUtil.parseCondExpression(whereDeParse.getBuffer().toString());
+				} catch (JSQLParserException e) {
+					e.printStackTrace();
+					this.whereExp = null;
+				}
 			}
 		}
 	}
+
+    @Override
+    public void visit(Column tableColumn) {
+        this.getBuffer().append(tableColumn.getColumnName());
+    }
 }

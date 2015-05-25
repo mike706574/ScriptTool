@@ -19,12 +19,14 @@ public class ToolUtils {
 		Script script = new Script(sourceFile);
 		
 		List<Statement> eStmts = script.CreateBackup();
-		List<Statement> bkStmts = script.CreateBackup();
+		List<Statement> bkStmts = script.CreateBackout();
 		List<String> currentStrings = script.currentStmtStrings;
 		
 		List<String> fileStrings = new LinkedList<String>();
 		eStmts.forEach(s -> fileStrings.add(ToolUtils.addEndLine(s.toString())));
+		fileStrings.add(System.lineSeparator());
 		currentStrings.forEach(s -> fileStrings.add(s += System.lineSeparator()));
+		fileStrings.add(System.lineSeparator());
 		bkStmts.forEach(s -> fileStrings.add("--" + ToolUtils.addEndLine(s.toString())));
 
 		String scriptStr = StringUtils.join(fileStrings, null);
@@ -32,10 +34,15 @@ public class ToolUtils {
 	}
 	
 	public static File CreateFileFromSource(File sourceFile) throws IOException {
-		String base = FilenameUtils.getBaseName(sourceFile.getAbsolutePath());
-		String newPath = base + "_out.dms";
+		String fileAbsPath = sourceFile.getAbsolutePath();
+		String base = FilenameUtils.getBaseName(fileAbsPath);
+		String path = FilenameUtils.getFullPath(fileAbsPath);
+		String newPath = path + base + "_out.dms";
 		
 		File newFile = new File(newPath);
+		if (newFile.exists()) {
+			newFile.delete();
+		}
 		return newFile;
 	}
 	

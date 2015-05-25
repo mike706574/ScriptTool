@@ -52,14 +52,18 @@ public class BackupTab extends Tab {
         doBtn.setText(BackupTab.genText);
         doBtn.setOnAction(e -> {
         	try {
+        		sourceFile = new File(sourcePathText.getText());
         		if ((sourceFile == null) || (!sourceFile.exists())) {
         			throw new IOException("Source File needed");
         		}
         		File newFile = ToolUtils.CreateFileFromSource(sourceFile);
 				ToolUtils.WriteBackupToFile(newFile, sourceFile);
+				new ScriptSuccess("Success", "Saved as " + newFile.getAbsolutePath());
 			} catch (IOException e1) {
+				e1.printStackTrace();
 				new ScriptError("File error", e1.getMessage());
 			} catch (JSQLParserException e2) {
+				e2.printStackTrace();
 				new ScriptError("Parsing error", e2.getMessage());
 			}
         });

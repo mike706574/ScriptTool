@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import provade.tools.schema.Export;
 import provade.tools.schema.Import;
@@ -37,17 +38,20 @@ public class Script {
 	public Script(File scriptFile) throws IOException, JSQLParserException {
 		this();
 		currentStmtStrings = FileUtils.readLines(scriptFile);
+		StringBuilder stmt = new StringBuilder();
 		for (String s : currentStmtStrings) {
-			if (!s.isEmpty()) {
-				this.AddStatement(s);
+			stmt.append(s);
+			if (!s.isEmpty() && StringUtils.endsWith(s, ";")) {
+				this.AddStatement(stmt.toString());
+				stmt = new StringBuilder();
 			}
 		}
 	}
 
 	public List<Statement> CreateBackup() {
 		List<Statement> bkUpStmts = new LinkedList<Statement>();
-		for (Statement s : updateStmts) {
-			Export e = new Export((Update) s);
+		for (Update s : updateStmts) {
+			Export e = new Export(s);
 			exportStmts.add(e);
 			bkUpStmts.add(e);
 		}
@@ -90,8 +94,7 @@ public class Script {
 	}
 
 	private void CreateDeletes() {
-		for (Statement s : insertStmts) {
-			Insert inStmt = (Insert) s;
+		for (Insert inStmt : insertStmts) {
 			Delete d = new Delete();
 			d.setTable(inStmt.getTable());
 
