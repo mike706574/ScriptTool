@@ -40,7 +40,7 @@ public class Script {
 		currentStmtStrings = FileUtils.readLines(scriptFile);
 		StringBuilder stmt = new StringBuilder();
 		for (String s : currentStmtStrings) {
-			stmt.append(s);
+			stmt.append(s + " ");
 			if (!s.isEmpty() && StringUtils.endsWith(s, ";")) {
 				this.AddStatement(stmt.toString());
 				stmt = new StringBuilder();
