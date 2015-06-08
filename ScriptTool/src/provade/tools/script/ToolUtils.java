@@ -9,15 +9,30 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import provade.tools.template.Bind;
+import provade.tools.template.Result;
+import provade.tools.template.Template;
+import provade.tools.template.UserInput;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.statement.Statement;
 
 public class ToolUtils {
 	
+	public static Script CreateScriptFromTemplate(Template template) throws JSQLParserException {
+		Script script = new Script();
+		List<Bind> binds = template.binds;
+		for (Bind b : binds) {
+			Result r = b.result;
+			UserInput in = template.findById(r.in);
+			if (in.value != null){
+				template.statement = template.statement.replace(b.to, in.value);
+			}
+		}
+		script.AddStatement(template.statement);
+		return script;
+	}
 	
-	public static void WriteBackupToFile(File newFile, File sourceFile) throws IOException, JSQLParserException {
-		Script script = new Script(sourceFile);
-		
+	public static void WriteBackupToFile(File newFile, Script script) throws IOException, JSQLParserException {		
 		List<Statement> eStmts = script.CreateBackup();
 		List<Statement> bkStmts = script.CreateBackout();
 		List<String> currentStrings = script.currentStmtStrings;
