@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.ParseException;
 import provade.tools.script.Script;
 import provade.tools.script.ToolUtils;
 import javafx.event.ActionEvent;
@@ -48,7 +49,8 @@ public class BackupTab extends Tab {
 			new ScriptError("File error", e1.getMessage());
 		} catch (JSQLParserException e2) {
 			e2.printStackTrace();
-			new ScriptError("Parsing error", e2.getMessage());
+			new ScriptError("Parsing error", e2.getCause().getMessage());
+			
 		}		
 	}
 	

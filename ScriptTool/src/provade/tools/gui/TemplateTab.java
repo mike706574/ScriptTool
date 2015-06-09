@@ -63,8 +63,10 @@ public class TemplateTab extends Tab {
 			}
 		} catch (JSQLParserException e) {
 			e.printStackTrace();
+			new ScriptError("Error", e.getCause().getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
+			new ScriptError("Error", e.getMessage());
 		}
 	}
 	
@@ -77,8 +79,10 @@ public class TemplateTab extends Tab {
 			flow.getChildren().add(this.createScriptBtn);
 		} catch (IOException e) {
 			e.printStackTrace();
+			new ScriptError("Error", e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
+			new ScriptError("Error", e.getMessage());
 		}
 	}
 

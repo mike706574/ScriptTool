@@ -35,15 +35,20 @@ public class ToolUtils {
 	public static void WriteBackupToFile(File newFile, Script script) throws IOException, JSQLParserException {		
 		List<Statement> eStmts = script.CreateBackup();
 		List<Statement> bkStmts = script.CreateBackout();
-		List<String> currentStrings = script.currentStmtStrings;
+		List<Statement> currentStmts = script.allStmts;
 		
 		List<String> fileStrings = new LinkedList<String>();
-		eStmts.forEach(s -> fileStrings.add(ToolUtils.addEndLine(s.toString())));
-		fileStrings.add(System.lineSeparator());
-		currentStrings.forEach(s -> fileStrings.add(s += System.lineSeparator()));
-		fileStrings.add(System.lineSeparator());
-		bkStmts.forEach(s -> fileStrings.add("--" + ToolUtils.addEndLine(s.toString())));
-
+		if (eStmts != null) {
+			eStmts.forEach(s -> fileStrings.add(ToolUtils.addEndLine(s.toString())));
+			fileStrings.add(System.lineSeparator());			
+		}
+		if (currentStmts != null) {
+			currentStmts.forEach(s -> fileStrings.add(s.toString() + System.lineSeparator()));
+			fileStrings.add(System.lineSeparator());			
+		}
+		if (bkStmts != null) {
+			bkStmts.forEach(s -> fileStrings.add("--" + ToolUtils.addEndLine(s.toString())));
+		}
 		String scriptStr = StringUtils.join(fileStrings, null);
 		FileUtils.writeStringToFile(newFile, scriptStr, "UTF-8", true);
 	}
