@@ -24,6 +24,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -39,8 +40,10 @@ public class TemplateTab extends Tab {
 	private Stage stage;
 	private ToolFileChooser fChooser;
 	private FlowPane flow;
+	private FlowPane currStmtsPane;
 	private Button createScriptBtn;
 	private InputGroup inputGroup;
+	private BorderPane borderPane;
 
 	public TemplateTab(Stage stage) {
 		super();
@@ -50,6 +53,11 @@ public class TemplateTab extends Tab {
 		this.initGui();
 	}
 	
+	private void addStatement() {
+		
+	}
+	
+	//TODO: if file already exists, ask if user wants to append to the file and append new statements to end
 	private void createScript() {
 		try {
 			FileChooser fChooser = new FileChooser();
@@ -86,19 +94,35 @@ public class TemplateTab extends Tab {
 		}
 	}
 
+	/*
+	 * TODO: -add the ability to add new 'rows'
+	 *       -or theres a side 'panel' that shows created statements, a button takes the inputs and creates a statement and stores it
+	 *        on the side panel. Another button takes all statements on the panel and creates the script
+	 */
 	private void initGui() {
 		EventHandler<ActionEvent> doClick = e -> this.loadTemplate();
 		fChooser = new ToolFileChooser(this.stage, "Template Path", "...", "Load", doClick);
 		createScriptBtn.setOnAction(e -> this.createScript());
 		
 		flow = new FlowPane();
-		flow.setVgap(8);
-		flow.setHgap(4);
+		//flow.setVgap(10);
+		flow.setHgap(10);
 		flow.setPrefWrapLength(300);
 		flow.getChildren().add(fChooser.getPane());
 		
+		Label currStmtsLabel = new Label("Current Statements");
+		currStmtsPane = new FlowPane();
+		currStmtsPane.setHgap(10);
+		currStmtsPane.setPrefWrapLength(300);
+		currStmtsPane.getChildren().add(currStmtsLabel);
+		
+		borderPane = new BorderPane();
+		borderPane.setLeft(flow);
+		borderPane.setCenter(currStmtsPane);
+		
+		
 		this.setText(TemplateTab.tabTitle);
-		this.setContent(flow);
+		this.setContent(borderPane);
 	}
 
 	private Pane createInputs(Template template) {

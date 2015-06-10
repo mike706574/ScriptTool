@@ -26,7 +26,7 @@ public class MainWindow extends Application {
         tabPane.getTabs().add(new BackupTab(mainStage));
         tabPane.getTabs().add(new TemplateTab(mainStage));
 
-        Scene scene = new Scene(tabPane, 400, 375);
+        Scene scene = new Scene(tabPane, 700, 375);
         mainStage.setScene(scene);
         mainStage.show();
 	}
