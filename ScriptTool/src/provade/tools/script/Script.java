@@ -19,6 +19,9 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.update.Update;
 
+/*
+ * TODO: join together like statements, if 2 stmts update same table try to convert into 1 with an 'in'
+ */
 public class Script {
 	public List<Statement> allStmts;
 	public List<Update> updateStmts;
@@ -42,7 +45,7 @@ public class Script {
 		for (String s : currentStmtStrings) {
 			stmt.append(s + " ");
 			if (!s.isEmpty() && StringUtils.endsWith(s, ";")) {
-				this.AddStatement(stmt.toString());
+				this.AddStatementString(stmt.toString());
 				stmt = new StringBuilder();
 			}
 		}
@@ -70,16 +73,14 @@ public class Script {
 		bkStmts.addAll(deleteStmts);
 		return bkStmts;
 	}
+	
+	public void AddStatement(Statement stmt) {
+		this.AddToList(stmt);
+	}
 
-	public void AddStatement(String stmt) throws JSQLParserException {
+	public void AddStatementString(String stmt) throws JSQLParserException {
 		Statement pStmt = CCJSqlParserUtil.parse(stmt);
-
-		allStmts.add(pStmt);
-		if (pStmt instanceof Update) {
-			updateStmts.add((Update)pStmt);
-		} else if (pStmt instanceof Insert) {
-			insertStmts.add((Insert)pStmt);
-		}
+		this.AddToList(pStmt);
 	}
 
 	public static List<Delete> GetDeletesFromExports(List<Export> exports) {
@@ -91,6 +92,15 @@ public class Script {
 			deletes.add(d);
 		}
 		return deletes;
+	}
+	
+	private void AddToList(Statement stmt) {
+		allStmts.add(stmt);
+		if (stmt instanceof Update) {
+			updateStmts.add((Update)stmt);
+		} else if (stmt instanceof Insert) {
+			insertStmts.add((Insert)stmt);
+		}
 	}
 
 	private void CreateDeletes() {

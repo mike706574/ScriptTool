@@ -14,21 +14,36 @@ import provade.tools.template.Result;
 import provade.tools.template.Template;
 import provade.tools.template.UserInput;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 
 public class ToolUtils {
 	
-	public static Script CreateScriptFromTemplate(Template template) throws JSQLParserException {
+	public static Script CreateScriptFromList(List<String> statements) throws JSQLParserException {
 		Script script = new Script();
+		for(String s : statements) {
+			script.AddStatementString(s);
+		}
+		return script;
+	}
+	
+	public static Statement getStatementFromTemplate(Template template) throws JSQLParserException {
+		String stmtStr = template.statement;
 		List<Bind> binds = template.binds;
 		for (Bind b : binds) {
 			Result r = b.result;
 			UserInput in = template.findById(r.in);
 			if (in.value != null){
-				template.statement = template.statement.replace(b.to, in.value);
+				stmtStr = stmtStr.replace(b.to, in.value);
 			}
 		}
-		script.AddStatement(template.statement);
+		return CCJSqlParserUtil.parse(stmtStr);
+	}
+	
+	public static Script CreateScriptFromTemplate(Template template) throws JSQLParserException {
+		Script script = new Script();
+		Statement formedStmt = ToolUtils.getStatementFromTemplate(template);
+		script.AddStatement(formedStmt);
 		return script;
 	}
 	

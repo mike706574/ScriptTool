@@ -3,9 +3,11 @@ package provade.tools.gui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.statement.Statement;
 
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -28,6 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -36,12 +39,15 @@ public class TemplateTab extends Tab {
 	public static final String tabTitle = "Create from template";
 	public static final String createBtnLabel = "Create script";
 	
+	public List<TextField> stmtList;
 	public List<UserInput> userInputs;
 	private Stage stage;
 	private ToolFileChooser fChooser;
 	private FlowPane flow;
-	private FlowPane currStmtsPane;
+	private VBox currStmtsPane;
+	private GridPane createAddBtnsPane;
 	private Button createScriptBtn;
+	private Button addStmtBtn;
 	private InputGroup inputGroup;
 	private BorderPane borderPane;
 
@@ -50,11 +56,22 @@ public class TemplateTab extends Tab {
 		this.stage = stage;
 		this.inputGroup = new InputGroup();
 		this.createScriptBtn = new Button(TemplateTab.createBtnLabel);
+		this.addStmtBtn = new Button("Add");
+		this.stmtList = new LinkedList<TextField>();
 		this.initGui();
 	}
 	
 	private void addStatement() {
-		
+		inputGroup.setValues();
+		try {
+			String currStmt = ToolUtils.getStatementFromTemplate(inputGroup.template).toString();
+			TextField stmtText = new TextField(currStmt);
+			stmtList.add(stmtText);
+			currStmtsPane.getChildren().add(stmtText);
+		} catch (JSQLParserException e) {
+			e.printStackTrace();
+			new ScriptError("Error", e.getCause().getMessage());
+		}
 	}
 	
 	//TODO: if file already exists, ask if user wants to append to the file and append new statements to end
@@ -64,11 +81,11 @@ public class TemplateTab extends Tab {
 			fChooser.getExtensionFilters().addAll(new ExtensionFilter("dms", "*.dms"));
 			fChooser.setTitle("Save as");
 			File saveAsFile = fChooser.showSaveDialog(this.stage);
-			if (saveAsFile != null) {
-				inputGroup.setValues();
-				Script script = ToolUtils.CreateScriptFromTemplate(inputGroup.template);
-				ToolUtils.WriteBackupToFile(saveAsFile, script);				
-			}
+			List<String> statements = new ArrayList<String>(stmtList.size());
+			stmtList.forEach(e -> statements.add(e.getText()));
+			Script script = ToolUtils.CreateScriptFromList(statements);
+			ToolUtils.WriteBackupToFile(saveAsFile, script);
+			new ScriptSuccess("Success", "Script created: " + saveAsFile.getAbsolutePath());
 		} catch (JSQLParserException e) {
 			e.printStackTrace();
 			new ScriptError("Error", e.getCause().getMessage());
@@ -84,7 +101,8 @@ public class TemplateTab extends Tab {
 			Serializer serialize = new Persister();
 			Template template = serialize.read(Template.class, sourceFile);
 			flow.getChildren().add(this.createInputs(template));
-			flow.getChildren().add(this.createScriptBtn);
+			flow.getChildren().add(this.createAddBtnsPane);
+			this.stage.setHeight(this.createAddBtnsPane.getLayoutY());
 		} catch (IOException e) {
 			e.printStackTrace();
 			new ScriptError("Error", e.getMessage());
@@ -103,6 +121,7 @@ public class TemplateTab extends Tab {
 		EventHandler<ActionEvent> doClick = e -> this.loadTemplate();
 		fChooser = new ToolFileChooser(this.stage, "Template Path", "...", "Load", doClick);
 		createScriptBtn.setOnAction(e -> this.createScript());
+		addStmtBtn.setOnAction(e -> this.addStatement());
 		
 		flow = new FlowPane();
 		//flow.setVgap(10);
@@ -111,37 +130,38 @@ public class TemplateTab extends Tab {
 		flow.getChildren().add(fChooser.getPane());
 		
 		Label currStmtsLabel = new Label("Current Statements");
-		currStmtsPane = new FlowPane();
-		currStmtsPane.setHgap(10);
-		currStmtsPane.setPrefWrapLength(300);
+		currStmtsPane = new VBox();
+		currStmtsPane.setPadding(new Insets(25, 25, 25, 25));
 		currStmtsPane.getChildren().add(currStmtsLabel);
 		
 		borderPane = new BorderPane();
 		borderPane.setLeft(flow);
 		borderPane.setCenter(currStmtsPane);
 		
+		createAddBtnsPane = new GridPane();
+		createAddBtnsPane.setAlignment(Pos.CENTER);
+		createAddBtnsPane.setHgap(5);
+		createAddBtnsPane.setVgap(10);
+		createAddBtnsPane.setPadding(new Insets(10, 10, 10, 10));
+		createAddBtnsPane.add(addStmtBtn, 0, 0);
+		createAddBtnsPane.add(createScriptBtn, 0, 1);
 		
 		this.setText(TemplateTab.tabTitle);
 		this.setContent(borderPane);
 	}
 
 	private Pane createInputs(Template template) {
-		GridPane inputsGrid = new GridPane();
-		inputsGrid.setAlignment(Pos.CENTER);
-		inputsGrid.setHgap(10);
-		inputsGrid.setVgap(10);
+		VBox inputsGrid = new VBox(8);
 		inputsGrid.setPadding(new Insets(25, 25, 25, 25));
 
-		int currRow = 0;
 		userInputs = template.inputs;
 		for (UserInput i : userInputs) {
 			TextField txtField = new TextField();
 			Label lbl = new Label(i.label);
 			lbl.setLabelFor(txtField);
 			TemplateInputGroup inGroup = new TemplateInputGroup(i.id, txtField, lbl);
-			inputsGrid.add(inGroup, 0, currRow);
+			inputsGrid.getChildren().add(inGroup);
 			inputGroup.addInput(inGroup);
-			currRow++;
 		}
 		inputGroup.template = template;
 		return inputsGrid;
