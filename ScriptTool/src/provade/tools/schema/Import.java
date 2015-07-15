@@ -13,7 +13,6 @@ public class Import implements Statement {
 	
 	@Override
 	public void accept(StatementVisitor statementVisitor) {
-		// TODO Auto-generated method stub
 		
 	}
 	

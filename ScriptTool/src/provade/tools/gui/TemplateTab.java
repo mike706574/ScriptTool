@@ -81,11 +81,13 @@ public class TemplateTab extends Tab {
 			fChooser.getExtensionFilters().addAll(new ExtensionFilter("dms", "*.dms"));
 			fChooser.setTitle("Save as");
 			File saveAsFile = fChooser.showSaveDialog(this.stage);
-			List<String> statements = new ArrayList<String>(stmtList.size());
-			stmtList.forEach(e -> statements.add(e.getText()));
-			Script script = ToolUtils.CreateScriptFromList(statements);
-			ToolUtils.WriteBackupToFile(saveAsFile, script);
-			new ScriptSuccess("Success", "Script created: " + saveAsFile.getAbsolutePath());
+			if (saveAsFile != null) {
+				List<String> statements = new ArrayList<String>(stmtList.size());
+				stmtList.forEach(e -> statements.add(e.getText()));
+				Script script = ToolUtils.CreateScriptFromList(statements);
+				ToolUtils.WriteBackupToFile(saveAsFile, script);
+				new ScriptSuccess("Success", "Script created: " + saveAsFile.getAbsolutePath());
+			}
 		} catch (JSQLParserException e) {
 			e.printStackTrace();
 			new ScriptError("Error", e.getCause().getMessage());
@@ -113,9 +115,7 @@ public class TemplateTab extends Tab {
 	}
 
 	/*
-	 * TODO: -add the ability to add new 'rows'
-	 *       -or theres a side 'panel' that shows created statements, a button takes the inputs and creates a statement and stores it
-	 *        on the side panel. Another button takes all statements on the panel and creates the script
+	 * TODO: -resize window after template gets loadeds
 	 */
 	private void initGui() {
 		EventHandler<ActionEvent> doClick = e -> this.loadTemplate();

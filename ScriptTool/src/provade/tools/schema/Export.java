@@ -24,8 +24,7 @@ public class Export implements Statement {
 	
 	@Override
 	public void accept(StatementVisitor statementVisitor) {
-		// TODO Auto-generated method stub
-		
+
 	}
 	
 	public Table getTable() {
