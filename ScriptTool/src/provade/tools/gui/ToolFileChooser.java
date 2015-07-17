@@ -57,7 +57,7 @@ public class ToolFileChooser {
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        grid.setPadding(new Insets(0, 0, 0, 0));
         grid.add(label, 0, 1);
         grid.add(chooseBtn, 1, 2);
         grid.add(doBtn, 0, 4);
