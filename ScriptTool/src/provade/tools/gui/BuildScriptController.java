@@ -14,17 +14,21 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
 import provade.tools.script.Script;
+import provade.tools.script.ScriptParseException;
 import provade.tools.script.ToolUtils;
 import provade.tools.template.Template;
 import provade.tools.template.UserInput;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -32,9 +36,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 /*
  * TODO: 
- *  1) Create my own exception for the controllers to catch, will be thrown in classes like script that is more informative
- *  2) add a delete option on the current statements pane to delete individual statements, or a clear all button
- *  3) modify gui so that the current statements pane will resize the text boxes based on input length
+ *  1) modify gui so that the current statements pane will resize the text boxes based on input length
  */
 public class BuildScriptController {
 	
@@ -48,6 +50,8 @@ public class BuildScriptController {
     private URL location;
     @FXML
     private Button addStmtsBtn;
+    @FXML
+    private Button deleteAllBtn;
     @FXML
     private VBox currStmtsPane;
     @FXML
@@ -71,11 +75,13 @@ public class BuildScriptController {
         assert mainMenu != null : "fx:id=\"mainMenu\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
         assert templateInputsPane != null : "fx:id=\"templateInputsPane\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
         assert exportBackupMenu != null : "fx:id=\"exportBackupMenu\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
+        assert deleteAllBtn != null : "fx:id=\"deleteAllBtn\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
 
         this.loadTemplateMenu.setOnAction(e -> loadTemplate());
         this.exportBackupMenu.setOnAction(e -> exportBackup());
         this.loadScriptMenu.setOnAction(e -> loadExistingScript());
         this.addStmtsBtn.setOnAction(e -> addStmtFromInput());
+        this.deleteAllBtn.setOnAction(e -> removeAllStatements());
         this.inputGroup = new InputGroup();
         this.stmtList = new LinkedList<TextField>();
     }
@@ -98,9 +104,9 @@ public class BuildScriptController {
 				ToolUtils.WriteBackupToFile(saveAsFile, script);
 				new ScriptSuccess("Success", "Script created: " + saveAsFile.getAbsolutePath());
 			}
-		} catch (JSQLParserException e) {
+		} catch (ScriptParseException e) {
 			e.printStackTrace();
-			new ScriptError("Error", e.getCause().getMessage());
+			new ScriptError("Error", e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
 			new ScriptError("Error", e.getMessage());
@@ -110,23 +116,40 @@ public class BuildScriptController {
     private void loadExistingScript() {
     	try {
     		File sourceFile = this.loadFile();
-    		Script script = new Script(sourceFile);
-    		for(String s : script.currentStmtStrings) {
-    			this.addStmt(s);
+    		if (sourceFile != null) {
+        		Script script = new Script(sourceFile);
+        		for(String s : script.currentStmtStrings) {
+        			this.addStmt(s);
+        		}
     		}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			new ScriptError("File error", e1.getMessage());
-		} catch (JSQLParserException e2) {
+		} catch (ScriptParseException e2) {
 			e2.printStackTrace();
-			new ScriptError("Parsing error", e2.getCause().getMessage());
+			new ScriptError("Parsing error", e2.getMessage());
 		}
     }
     
+    private void removeAllStatements() {
+    	stmtList.clear();
+    	currStmtsPane.getChildren().clear();
+    }
+    
+    private void removeStatement(Node remNode, String stmt) {
+    	stmtList.remove(stmt);
+    	currStmtsPane.getChildren().removeAll(remNode);
+    }
+    
     private void addStmt(String stmt) {
+    	HBox hbox = new HBox();
+    	Button remBtn = new Button("x");
+    	remBtn.setOnAction(e -> removeStatement(hbox, stmt));
 		TextField stmtText = new TextField(stmt);
+		HBox.setHgrow(stmtText, Priority.ALWAYS);
+		hbox.getChildren().addAll(stmtText, remBtn);
 		stmtList.add(stmtText);
-		currStmtsPane.getChildren().add(stmtText);
+		currStmtsPane.getChildren().add(hbox);
     }
     
     private void addStmtFromInput() {
@@ -134,9 +157,9 @@ public class BuildScriptController {
     	try {
 			String currStmt = ToolUtils.getStatementFromTemplate(inputGroup.template).toString();
 			this.addStmt(currStmt);
-		} catch (JSQLParserException e) {
+		} catch (ScriptParseException e) {
 			e.printStackTrace();
-			new ScriptError("Parsing error", e.getCause().getMessage());
+			new ScriptError("Parsing error", e.getMessage());
 		}
     }
     

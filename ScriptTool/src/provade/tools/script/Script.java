@@ -38,7 +38,7 @@ public class Script {
 		deleteStmts = new LinkedList<Delete>();
 	}
 
-	public Script(File scriptFile) throws IOException, JSQLParserException {
+	public Script(File scriptFile) throws IOException, ScriptParseException {
 		this();
 		currentStmtStrings = FileUtils.readLines(scriptFile);
 		StringBuilder stmt = new StringBuilder();
@@ -78,8 +78,14 @@ public class Script {
 		this.AddToList(stmt);
 	}
 
-	public void AddStatementString(String stmt) throws JSQLParserException {
-		Statement pStmt = CCJSqlParserUtil.parse(stmt);
+	public void AddStatementString(String stmt) throws ScriptParseException {
+		Statement pStmt;
+		try {
+			pStmt = CCJSqlParserUtil.parse(stmt);
+		} catch (JSQLParserException e) {
+			e.printStackTrace();
+			throw new ScriptParseException(stmt, e.getCause());
+		}
 		this.AddToList(pStmt);
 	}
 
