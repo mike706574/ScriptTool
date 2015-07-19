@@ -169,6 +169,8 @@ public class BuildScriptController {
 			Serializer serialize = new Persister();
 			try {
 				Template template = serialize.read(Template.class, templateFile);
+				templateInputsPane.getChildren().clear();
+				inputGroup.getInputs().clear();
 				this.createInputs(template, templateInputsPane);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -178,12 +180,9 @@ public class BuildScriptController {
     }
     
 	private void createInputs(Template template, Pane pane) {
-		List<UserInput> userInputs = template.inputs;
-		for (UserInput i : userInputs) {
-			TextField txtField = new TextField();
-			Label lbl = new Label(i.label);
-			lbl.setLabelFor(txtField);
-			TemplateInputGroup inGroup = new TemplateInputGroup(i.id, txtField, lbl);
+		List<UserInput> uInputs = template.inputs;
+		for (UserInput u : uInputs) {
+			TemplateInputGroup inGroup = new TemplateInputGroup(u);
 			pane.getChildren().add(inGroup);
 			inputGroup.addInput(inGroup);
 		}
