@@ -19,7 +19,7 @@ import net.sf.jsqlparser.statement.Statement;
 
 public class ToolUtils {
 	
-	public static Script CreateScriptFromList(List<String> statements) throws JSQLParserException {
+	public static Script CreateScriptFromList(List<String> statements) throws ScriptParseException {
 		Script script = new Script();
 		for(String s : statements) {
 			script.AddStatementString(s);
@@ -27,7 +27,7 @@ public class ToolUtils {
 		return script;
 	}
 	
-	public static Statement getStatementFromTemplate(Template template) throws JSQLParserException {
+	public static Statement getStatementFromTemplate(Template template) throws ScriptParseException {
 		String stmtStr = template.statement;
 		List<Bind> binds = template.binds;
 		for (Bind b : binds) {
@@ -37,17 +37,22 @@ public class ToolUtils {
 				stmtStr = stmtStr.replace(b.to, in.value);
 			}
 		}
-		return CCJSqlParserUtil.parse(stmtStr);
+		try {
+			return CCJSqlParserUtil.parse(stmtStr);
+		} catch (JSQLParserException e) {
+			e.printStackTrace();
+			throw new ScriptParseException(stmtStr, e.getCause());
+		}
 	}
 	
-	public static Script CreateScriptFromTemplate(Template template) throws JSQLParserException {
+	public static Script CreateScriptFromTemplate(Template template) throws ScriptParseException {
 		Script script = new Script();
 		Statement formedStmt = ToolUtils.getStatementFromTemplate(template);
 		script.AddStatement(formedStmt);
 		return script;
 	}
 	
-	public static void WriteBackupToFile(File newFile, Script script) throws IOException, JSQLParserException {		
+	public static void WriteBackupToFile(File newFile, Script script) throws IOException {		
 		List<Statement> eStmts = script.CreateBackup();
 		List<Statement> bkStmts = script.CreateBackout();
 		List<Statement> currentStmts = script.allStmts;

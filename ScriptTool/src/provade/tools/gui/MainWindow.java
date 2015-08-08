@@ -1,34 +1,35 @@
 package provade.tools.gui;
 
-import java.io.File;
+import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.TabPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class MainWindow extends Application {
 	public Stage mainStage;
-	public DirectoryChooser chooser;
-	public FileChooser sourceFileChooser;
-	public File directory;
-	public String sourceFilePath;
-	public String newFilePath;
 	
 	@Override
 	public void start(Stage arg0) throws Exception {
 		mainStage = arg0;
 		mainStage.setTitle("Provade Script Tool");
 
-        TabPane tabPane = new TabPane();
-        tabPane.getTabs().add(new BackupTab(mainStage));
-        tabPane.getTabs().add(new TemplateTab(mainStage));
+        try {
+            // Load root layout from fxml file.
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainWindow.class.getResource("/scriptToolScene.fxml"));
+            AnchorPane rootLayout = (AnchorPane) loader.load();
+            Scene scene = new Scene(rootLayout, 700, 375);
+            BuildScriptController sContr = loader.getController();
+            sContr.setStage(mainStage);
+            mainStage.setScene(scene);
+            mainStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        Scene scene = new Scene(tabPane, 700, 375);
-        mainStage.setScene(scene);
-        mainStage.show();
 	}
 
 }
