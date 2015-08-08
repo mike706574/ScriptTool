@@ -1,4 +1,4 @@
-package provade.tools.script;
+package scripttool.tools.script;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import provade.tools.schema.Export;
-import provade.tools.schema.Import;
+import scripttool.tools.schema.Export;
+import scripttool.tools.schema.Import;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;

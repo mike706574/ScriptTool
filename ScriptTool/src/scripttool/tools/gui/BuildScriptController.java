@@ -1,4 +1,4 @@
-package provade.tools.gui;
+package scripttool.tools.gui;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,19 +13,22 @@ import net.sf.jsqlparser.JSQLParserException;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
-import provade.tools.script.Script;
-import provade.tools.script.ScriptParseException;
-import provade.tools.script.ToolUtils;
-import provade.tools.template.Template;
-import provade.tools.template.UserInput;
+import scripttool.tools.script.Script;
+import scripttool.tools.script.ScriptMain;
+import scripttool.tools.script.ScriptParseException;
+import scripttool.tools.script.ToolUtils;
+import scripttool.tools.template.Template;
+import scripttool.tools.template.UserInput;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -63,6 +66,10 @@ public class BuildScriptController {
     @FXML
     private MenuItem exportBackupMenu;
     @FXML
+    private MenuItem aboutMenu;
+    @FXML
+    private MenuItem clearAllMenu;
+    @FXML
     private MenuBar mainMenu;
 
 
@@ -76,10 +83,13 @@ public class BuildScriptController {
         assert templateInputsPane != null : "fx:id=\"templateInputsPane\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
         assert exportBackupMenu != null : "fx:id=\"exportBackupMenu\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
         assert deleteAllBtn != null : "fx:id=\"deleteAllBtn\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
+        assert clearAllMenu != null : "fx:id=\"clearAllMenu\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
+        assert aboutMenu != null : "fx:id=\"aboutMenu\" was not injected: check your FXML file 'scriptToolScene.fxml'.";
 
         this.loadTemplateMenu.setOnAction(e -> loadTemplate());
         this.exportBackupMenu.setOnAction(e -> exportBackup());
         this.loadScriptMenu.setOnAction(e -> loadExistingScript());
+        this.aboutMenu.setOnAction(e -> about());
         this.addStmtsBtn.setOnAction(e -> addStmtFromInput());
         this.deleteAllBtn.setOnAction(e -> removeAllStatements());
         this.inputGroup = new InputGroup();
@@ -88,6 +98,13 @@ public class BuildScriptController {
     
     public void setStage(Stage stage) {
     	this.stage = stage;
+    }
+    
+    private void about() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("About");
+		alert.setContentText("Provade Script Tool\nVersion " + ScriptMain.version + "\nWritten by Tim Andracek");
+		alert.show();
     }
     
     //TODO: if file already exists, ask if user wants to append to the file and append new statements to end

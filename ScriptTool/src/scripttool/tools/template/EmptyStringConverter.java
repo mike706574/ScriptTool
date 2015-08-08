@@ -1,4 +1,4 @@
-package provade.tools.template;
+package scripttool.tools.template;
 
 import org.simpleframework.xml.convert.Converter;
 import org.simpleframework.xml.stream.InputNode;

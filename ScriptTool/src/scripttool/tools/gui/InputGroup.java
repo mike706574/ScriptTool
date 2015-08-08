@@ -1,4 +1,4 @@
-package provade.tools.gui;
+package scripttool.tools.gui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,10 +6,10 @@ import java.util.List;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import provade.tools.template.Bind;
-import provade.tools.template.Result;
-import provade.tools.template.Template;
-import provade.tools.template.UserInput;
+import scripttool.tools.template.Bind;
+import scripttool.tools.template.Result;
+import scripttool.tools.template.Template;
+import scripttool.tools.template.UserInput;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;

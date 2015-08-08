@@ -1,4 +1,4 @@
-package provade.tools.script;
+package scripttool.tools.script;
 
 public class ScriptParseException extends Exception {
 	private static final long serialVersionUID = 1L;

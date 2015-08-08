@@ -1,4 +1,4 @@
-package provade.tools.script;
+package scripttool.tools.script;
 
 import java.util.ArrayList;
 import java.util.List;

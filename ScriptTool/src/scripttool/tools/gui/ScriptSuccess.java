@@ -1,4 +1,4 @@
-package provade.tools.gui;
+package scripttool.tools.gui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
