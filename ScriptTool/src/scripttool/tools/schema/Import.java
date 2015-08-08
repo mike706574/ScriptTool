@@ -1,4 +1,4 @@
-package provade.tools.schema;
+package scripttool.tools.schema;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;

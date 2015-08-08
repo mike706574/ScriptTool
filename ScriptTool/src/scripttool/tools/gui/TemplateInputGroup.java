@@ -1,12 +1,12 @@
-package provade.tools.gui;
+package scripttool.tools.gui;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import provade.tools.template.Option;
-import provade.tools.template.Template;
-import provade.tools.template.UserInput;
+import scripttool.tools.template.Option;
+import scripttool.tools.template.Template;
+import scripttool.tools.template.UserInput;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;

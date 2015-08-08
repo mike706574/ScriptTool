@@ -1,4 +1,4 @@
-package provade.tools.schema;
+package scripttool.tools.schema;
 
 import java.util.List;
 
