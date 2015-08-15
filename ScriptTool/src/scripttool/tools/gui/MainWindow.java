@@ -14,7 +14,7 @@ public class MainWindow extends Application {
 	@Override
 	public void start(Stage arg0) throws Exception {
 		mainStage = arg0;
-		mainStage.setTitle("Provade Script Tool (Beta)");
+		mainStage.setTitle("Script Tool (Beta)");
 
         try {
             // Load root layout from fxml file.

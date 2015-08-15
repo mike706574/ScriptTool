@@ -103,7 +103,7 @@ public class BuildScriptController {
     private void about() {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("About");
-		alert.setContentText("Provade Script Tool\nVersion " + ScriptMain.version + "\nWritten by Tim Andracek");
+		alert.setContentText("Script Tool\nVersion " + ScriptMain.version + "\nWritten by Tim Andracek");
 		alert.show();
     }
     
