@@ -11,7 +11,9 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.SelectVisitor;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 public class WhereExpDeParser extends ExpressionDeParser {
 	private List<Column> columns;
@@ -19,7 +21,9 @@ public class WhereExpDeParser extends ExpressionDeParser {
 	private Expression whereExp;
 	
 	public WhereExpDeParser(List<Column> columns, StringBuilder buffer) {
-		super(null, buffer);
+		SelectDeParser sParser = new SelectDeParser(this, buffer);
+		this.setBuffer(buffer);
+		this.setSelectVisitor(sParser);
 		this.columns = columns;
 	}
 	
