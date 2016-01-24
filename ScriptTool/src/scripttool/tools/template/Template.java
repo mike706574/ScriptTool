@@ -6,14 +6,17 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+/*
+ * TODO: convert to allow multiple statements
+ */
 @Root
 public class Template {
 	@ElementList
 	public List<UserInput> inputs;
 	@ElementList(required=false)
 	public List<Bind> binds;
-	@Element
-	public String statement;
+	@ElementList
+	public List<TemplStatement> statements;
 	
 	public Template() {
 		

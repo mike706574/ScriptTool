@@ -171,13 +171,17 @@ public class BuildScriptController {
     
     private void addStmtFromInput() {
     	inputGroup.setValues();
+    	List<String> stmts = new ArrayList<String>();
     	try {
-			String currStmt = ToolUtils.getStatementFromTemplate(inputGroup.template).toString();
-			this.addStmt(currStmt);
+    		stmts = ToolUtils.getStatementStringsFromTemplate(inputGroup.template);
 		} catch (ScriptParseException e) {
 			e.printStackTrace();
 			new ScriptError("Parsing error", e.getMessage());
-		}
+		}  
+    	for (String currStmt : stmts) {
+    		this.addStmt(currStmt);
+    	}
+
     }
     
     private void loadTemplate() {
