@@ -65,9 +65,10 @@ public class Script {
 	public List<Statement> CreateBackout() {
 		List<Statement> bkStmts = new LinkedList<Statement>();
 		if (exportStmts.size() > 0) {
+			/* Convert to update_dups, should add that statement here
 			List<Delete> eDeletes = Script.GetDeletesFromExports(exportStmts);
 			bkStmts.addAll(eDeletes);
-			bkStmts.add(new Import());
+			bkStmts.add(new Import());*/
 		}
 		this.CreateDeletes();
 		bkStmts.addAll(deleteStmts);

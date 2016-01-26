@@ -94,7 +94,7 @@ public class ToolUtils {
 	
 	public static void WriteBackupToFile(File newFile, Script script) throws IOException {		
 		List<Statement> eStmts = script.CreateBackup();
-		//List<Statement> bkStmts = script.CreateBackout();
+		List<Statement> bkStmts = script.CreateBackout();
 		List<Statement> currentStmts = script.allStmts;
 		
 		List<String> fileStrings = new LinkedList<String>();
@@ -106,14 +106,16 @@ public class ToolUtils {
 			currentStmts.forEach(s -> fileStrings.add(ToolUtils.addEndLine(s.toString())));
 			fileStrings.add(System.lineSeparator());			
 		}
-		/*if (bkStmts != null) {
-			bkStmts.forEach(s -> fileStrings.add("--" + ToolUtils.addEndLine(s.toString())));
-		}*/
-		// Instead of deleting what was exported, changed to just update the dups
 		if (eStmts != null) {
-			fileStrings.add("--Backout" + System.lineSeparator());
+			//TODO: somehow create this as a statement that so the script class can add it instead
 			fileStrings.add("--SET UPDATE_DUPS" + ";" + System.lineSeparator());
 		}
+		if (bkStmts != null) {
+			bkStmts.forEach(s -> fileStrings.add("--" + ToolUtils.addEndLine(s.toString())));
+		}
+		// Instead of deleting what was exported, changed to just update the dups
+		fileStrings.add("--Backout" + System.lineSeparator());
+
 		String scriptStr = StringUtils.join(fileStrings, null);
 		FileUtils.writeStringToFile(newFile, scriptStr, "UTF-8", true);
 	}
