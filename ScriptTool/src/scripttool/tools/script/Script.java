@@ -40,9 +40,6 @@ public class Script {
 		bkDeleteStmts = new LinkedList<Delete>();
 	}
 
-	/*
-	 * TODO: Disregard anything thats not a valid statement
-	 */
 	public Script(File scriptFile) throws IOException, ScriptParseException {
 		this();
 		currentStmtStrings = FileUtils.readLines(scriptFile);
