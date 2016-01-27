@@ -28,6 +28,7 @@ public class Script {
 	public List<Insert> insertStmts;
 	public List<Export> exportStmts;
 	public List<Delete> deleteStmts;
+	public List<Delete> bkDeleteStmts;
 	public List<String> currentStmtStrings;
 
 	public Script() {
@@ -36,15 +37,19 @@ public class Script {
 		insertStmts = new LinkedList<Insert>();
 		exportStmts = new LinkedList<Export>();
 		deleteStmts = new LinkedList<Delete>();
+		bkDeleteStmts = new LinkedList<Delete>();
 	}
 
+	/*
+	 * TODO: Disregard anything thats not a valid statement
+	 */
 	public Script(File scriptFile) throws IOException, ScriptParseException {
 		this();
 		currentStmtStrings = FileUtils.readLines(scriptFile);
 		StringBuilder stmt = new StringBuilder();
 		for (String s : currentStmtStrings) {
 			stmt.append(s + " ");
-			if (!s.isEmpty() && StringUtils.endsWith(s, ";")) {
+			if (this.isStringValidStmt(s)) {
 				this.AddStatementString(stmt.toString());
 				stmt = new StringBuilder();
 			}
@@ -58,6 +63,11 @@ public class Script {
 			exportStmts.add(e);
 			bkUpStmts.add(e);
 		}
+		for (Delete d : deleteStmts) {
+			Export e = new Export(d);
+			exportStmts.add(e);
+			bkUpStmts.add(d);
+		}
 
 		return bkUpStmts;
 	}
@@ -67,11 +77,11 @@ public class Script {
 		if (exportStmts.size() > 0) {
 			/* Convert to update_dups, should add that statement here
 			List<Delete> eDeletes = Script.GetDeletesFromExports(exportStmts);
-			bkStmts.addAll(eDeletes);
-			bkStmts.add(new Import());*/
+			bkStmts.addAll(eDeletes);*/
+			bkStmts.add(new Import());
 		}
 		this.CreateDeletes();
-		bkStmts.addAll(deleteStmts);
+		bkStmts.addAll(bkDeleteStmts);
 		return bkStmts;
 	}
 	
@@ -107,6 +117,8 @@ public class Script {
 			updateStmts.add((Update)stmt);
 		} else if (stmt instanceof Insert) {
 			insertStmts.add((Insert)stmt);
+		} else if (stmt instanceof Delete) {
+			deleteStmts.add((Delete)stmt);
 		}
 	}
 
@@ -127,8 +139,17 @@ public class Script {
 			}
 
 			d.setWhere(whereExp);
-			deleteStmts.add(d);
+			bkDeleteStmts.add(d);
 		}
 	}
 
+	private boolean isStringValidStmt(String s) {
+		if (s.isEmpty()) {
+			return false;
+		}
+		if (StringUtils.startsWithAny(s, new String[] {"DELETE", "INSERT", "UPDATE"})) {
+			return true;
+		}
+		return false;
+	}
 }

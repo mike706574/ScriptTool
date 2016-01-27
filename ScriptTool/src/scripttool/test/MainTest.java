@@ -23,7 +23,7 @@ public class MainTest {
 
 	@Test
 	public void test() {
-		String stmt1 = " ";
+		String stmt1 = "INSERT INTO PSROLEUSER (ROLEUSER, ROLENAME, DYNAMIC_SW) VALUES ('IUA019', 'EOPP_USER', 'N')";
 		Script testScript = new Script();
 		try {
 			testScript.AddStatementString(stmt1);

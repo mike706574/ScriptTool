@@ -6,6 +6,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
+import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.update.Update;
@@ -20,6 +21,10 @@ public class Export implements Statement {
 	
 	public Export(Update u) {
 		this.CopyFromUpdate(u);
+	}
+	
+	public Export(Delete d) {
+		this.CopyFromDelete(d);
 	}
 	
 	@Override
@@ -45,6 +50,11 @@ public class Export implements Statement {
 		this.expressions = u.getExpressions();
 		this.fromItem = u.getFromItem();
 		this.joins = u.getJoins();
+	}
+	
+	public void CopyFromDelete(Delete d) {
+		this.table = d.getTable();
+		this.where = d.getWhere();
 	}
 	
 	@Override
