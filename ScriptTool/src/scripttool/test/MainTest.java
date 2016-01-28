@@ -23,7 +23,9 @@ public class MainTest {
 
 	@Test
 	public void test() {
-		String stmt1 = "INSERT INTO PSROLEUSER (ROLEUSER, ROLENAME, DYNAMIC_SW) VALUES ('IUA019', 'EOPP_USER', 'N')";
+		String stmt2 = "INSERT INTO PS_SEC_BU_OPR (OPRID, BUSINESS_UNIT) (SELECT 'Tim', Z.BUSINESS_UNIT FROM PS_SEC_BU_OPR Z WHERE Z.OPRID = 'Andra' AND NOT EXISTS (SELECT X.BUSINESS_UNIT FROM PS_SEC_BU_OPR X WHERE X.OPRID = 'Tim' AND X.BUSINESS_UNIT = Z.BUSINESS_UNIT))";
+		
+		String stmt1 = "DELETE FROM PSOPRDEFN WHERE OPRID = 'Andra'";
 		Script testScript = new Script();
 		try {
 			testScript.AddStatementString(stmt1);
