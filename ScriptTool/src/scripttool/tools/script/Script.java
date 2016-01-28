@@ -63,7 +63,7 @@ public class Script {
 		for (Delete d : deleteStmts) {
 			Export e = new Export(d);
 			exportStmts.add(e);
-			bkUpStmts.add(d);
+			bkUpStmts.add(e);
 		}
 
 		return bkUpStmts;

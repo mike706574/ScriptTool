@@ -23,6 +23,7 @@ public class MainTest {
 
 	@Test
 	public void test() {
+		/* TODO: fix for below statement, errors out when creating export */
 		String stmt2 = "INSERT INTO PS_SEC_BU_OPR (OPRID, BUSINESS_UNIT) (SELECT 'Tim', Z.BUSINESS_UNIT FROM PS_SEC_BU_OPR Z WHERE Z.OPRID = 'Andra' AND NOT EXISTS (SELECT X.BUSINESS_UNIT FROM PS_SEC_BU_OPR X WHERE X.OPRID = 'Tim' AND X.BUSINESS_UNIT = Z.BUSINESS_UNIT))";
 		
 		String stmt1 = "DELETE FROM PSOPRDEFN WHERE OPRID = 'Andra'";
@@ -32,12 +33,17 @@ public class MainTest {
 		} catch (ScriptParseException e) {
 			fail("Parse exception thrown: " + e.toString());
 		}
-		
+		List<Statement> exStmts = testScript.CreateBackup();
+		assertNotNull(exStmts);
+		for (Statement s : exStmts) {
+			System.out.println(s.toString());
+		}
 		List<Statement> bkStmts = testScript.CreateBackout();
 		assertNotNull(bkStmts);
 		for (Statement s : bkStmts) {
 			System.out.println(s.toString());
 		}
+
 	}
 
 }
