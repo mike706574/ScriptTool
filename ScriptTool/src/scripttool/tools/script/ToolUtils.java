@@ -52,10 +52,9 @@ public class ToolUtils {
 	
 	public static List<Statement> getStatementsFromTemplate(Template template) throws ScriptParseException {
 		ArrayList<Statement> templStmts = new ArrayList<Statement>();
-		List<TemplStatement> stmts = template.statements;
+		List<String> stmts = template.statements;
 		List<Bind> binds = template.binds;
-		for (TemplStatement stmt : stmts) {
-			String stmtStr = stmt.stmtString;
+		for (String stmtStr : stmts) {
 			for (Bind b : binds) {
 				Result r = b.result;
 				UserInput in = template.findById(r.in);
